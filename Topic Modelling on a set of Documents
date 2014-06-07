@@ -1,0 +1,9 @@
+Using Mallet http://mallet.cs.umass.edu/topics-devel.php as a reference, 
+I made an attempt to get top 10 topics from a set of documents.
+
+Test-DATA : C:\data\topic-input directory has 3 set of sample documents namely hill.txt,hawes.txt,equipartition_theorem.txt
+Topic Modelling has been done on the directory "topic-input"
+
+Sample Trial with reference to http://mallet.cs.umass.edu/topics-devel.php.
+
+
