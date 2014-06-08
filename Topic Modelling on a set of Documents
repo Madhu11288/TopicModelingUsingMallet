@@ -1,9 +1,133 @@
-Using Mallet http://mallet.cs.umass.edu/topics-devel.php as a reference, 
-I made an attempt to get top 10 topics from a set of documents.
+#I made an attempt to get top 10 topics from a set of documents.
+#Importing the data from a directory which has a list of documents.
 
-Test-DATA : C:\data\topic-input directory has 3 set of sample documents namely hill.txt,hawes.txt,equipartition_theorem.txt
-Topic Modelling has been done on the directory "topic-input"
+#Test-DATA : C:\data\topic-input directory has 3 set of sample documents namely hill.txt,hawes.txt,equipartition_theorem.txt
+#Topic Modelling has been done on the directory "topic-input"
 
-Sample Trial with reference to http://mallet.cs.umass.edu/topics-devel.php.
+#Sample Trial code tweeking with reference to http://mallet.cs.umass.edu/topics-devel.php.
+#This is just the first cut. Few of the logic needs to be adapted to get the preferred output.
+# Inferencing from the model can be added. Since I am still exploring mallet, this is still in nascent stage and 
+is subject to few errors.
+
+package cc.mallet.examples;
+
+import cc.mallet.util.*;
+import cc.mallet.types.*;
+import cc.mallet.pipe.*;
+import cc.mallet.pipe.iterator.*;
+import cc.mallet.topics.*;
+
+import java.util.*;
+import java.util.regex.*;
+import java.io.*;
+
+public class TopicModelOnSetOfDocuments {
+
+	private Pipe pipe;
+
+	public TopicModelOnSetOfDocuments() {
+		this.pipe = getPipe();
+
+	}
+
+	private Pipe getPipe() {
+		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
+
+		pipeList.add(new Input2CharSequence("UTF-8"));
+		pipeList.add(new CharSequenceLowercase());
+		pipeList.add(new CharSequence2TokenSequence(Pattern
+				.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")));
+		pipeList.add(new TokenSequenceRemoveStopwords(new File(
+				"C:\\Users\\Madhu\\git\\Mallet\\stoplists\\en.txt"), "UTF-8",
+				false, false, false));
+		pipeList.add(new TokenSequence2FeatureSequence());
+
+		return new SerialPipes(pipeList);
+
+	}
+
+	public static void main(String[] args) throws Exception {
+
+		TopicModelOnSetOfDocuments topicModelOnSetOfDocuments = new TopicModelOnSetOfDocuments();
+
+		// pass the directory name as argument which contains a set of
+		// documents
+		InstanceList instances = topicModelOnSetOfDocuments
+				.getInstanceListOnDirectory(new File(args[0]));
+
+		// Create a model with 10 topics, alpha_t = 0.01, beta_w = 0.01
+		int numTopics = 10;
+		ParallelTopicModel model = new ParallelTopicModel(numTopics, 1.0, 0.01);
+		model.addInstances(instances);
+		model.setNumIterations(150);
+		model.estimate();
+
+		// The data alphabet maps word IDs to strings
+		Alphabet dataAlphabet = instances.getDataAlphabet();
+
+		ArrayList<TopicAssignment> data = model.getData();
+		Formatter out = null;
+		// for each of the instanceID/instances, we need to find the tokens and
+		// topics
+		for (TopicAssignment topicAssignment : data) {
+			out = new Formatter(new StringBuilder(), Locale.US);
+			FeatureSequence tokens = (FeatureSequence) topicAssignment.instance
+					.getData();
+			LabelSequence topics = topicAssignment.topicSequence;
+			for (int position = 0; position < tokens.getLength(); position++) {
+				out.format("%s-%d ", dataAlphabet.lookupObject(tokens
+						.getIndexAtPosition(position)), topics
+						.getIndexAtPosition(position));
+			}
+			System.out.println(out);
+		}
+
+		// Estimate the topic distribution of all instances
+		for (int i = 0; i < data.size(); i++) {
+
+			double[] topicDistribution = model.getTopicProbabilities(i);
+
+			ArrayList<TreeSet<IDSorter>> topicSortedWords = model
+					.getSortedWords();
+
+			// Display top 10 words in topics of each instance
+			for (int topic = 0; topic < numTopics; topic++) {
+				Iterator<IDSorter> iterator = topicSortedWords.get(topic)
+						.iterator();
+
+				out = new Formatter(new StringBuilder(), Locale.US);
+				out.format("%d\t%.3f\t", topic, topicDistribution[topic]);
+				int rank = 0;
+				while (iterator.hasNext() && rank < 10) {
+					IDSorter idCountPair = iterator.next();
+					out.format("%s (%.0f) ",
+							dataAlphabet.lookupObject(idCountPair.getID()),
+							idCountPair.getWeight());
+					rank++;
+				}
+				System.out.println(out);
+
+			}
+		}
+
+	}
+
+	public InstanceList getInstanceListOnDirectory(File directory) {
+
+		FileIterator iterator = new FileIterator(directory, new FileFilter() {
+
+			@Override
+			public boolean accept(File file) {
+				return file.toString().endsWith(".txt");
+			}
+		}, Pattern.compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$"));
+
+		InstanceList instances = new InstanceList(this.pipe);
+
+		instances.addThruPipe(iterator);
+		return instances;
+
+	}
+}
 
 
