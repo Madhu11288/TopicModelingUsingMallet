@@ -1,13 +1,13 @@
-#I made an attempt to get top 10 topics from a set of documents.
-#Importing the data from a directory which has a list of documents.
+#Hi, its an attempt to get top 10 topics from a set of documents.
+#I first import the data from a directory which has a list of documents.
 
-#Test-DATA : C:\data\topic-input directory has 3 set of sample documents namely hill.txt,hawes.txt,equipartition_theorem.txt
+#Test-DATA : Directory : C:\data\topic-input has 3 set of sample documents namely hill.txt,hawes.txt,equipartition_theorem.txt
 #Topic Modelling has been done on the directory "topic-input"
 
-#Sample Trial code tweeking with reference to http://mallet.cs.umass.edu/topics-devel.php.
+#After refereing to  http://mallet.cs.umass.edu/topics-devel.php, I tried to tweek the code to get top 10 topics.
 #This is just the first cut. Few of the logic needs to be adapted to get the preferred output.
-# Inferencing from the model can be added. Since I am still exploring mallet, this is still in nascent stage and 
-is subject to few errors.
+#Inferencing from the model need to be added. Since I am still exploring mallet, this is in nascent stage and 
+is subjected to changes.
 
 package cc.mallet.examples;
 
