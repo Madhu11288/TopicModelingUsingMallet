@@ -4,7 +4,7 @@
 #Test-DATA : Directory : C:\data\topic-input has 3 set of sample documents namely hill.txt,hawes.txt,equipartition_theorem.txt
 #Topic Modelling has been done on the directory "topic-input"
 
-#After referring to  http://mallet.cs.umass.edu/topics-devel.php, I tried to tweek the code to get top 10 topics.
+#After referring to  http://mallet.cs.umass.edu/topics-devel.php, I tried to write a sample code to get top 10 topics.
 #This is the first cut of the implementation.
 #Inferencing from the model need to be added. Since I am still exploring mallet, this is in nascent stage and 
 is subjected to changes.
